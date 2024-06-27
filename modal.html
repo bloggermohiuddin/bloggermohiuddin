@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap 5 Modal Example with Dynamic Content</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Buttons to trigger the modal -->
+<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-file="1">
+  Button 1
+</button>
+<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#exampleModal" data-file="2">
+  Button 2
+</button>
+<button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal" data-file="3">
+  Button 3
+</button>
+<button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#exampleModal" data-file="4">
+  Button 4
+</button>
+<button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#exampleModal" data-file="5">
+  Button 5
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Dynamic content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  var exampleModal = document.getElementById('exampleModal');
+  exampleModal.addEventListener('show.bs.modal', function (event) {
+    var button = event.relatedTarget;
+    var fileNumber = button.getAttribute('data-file');
+    var modalBody = exampleModal.querySelector('.modal-body');
+
+    fetch('https://cdn.jsdelivr.net/npm/quran-json@3.1.2/dist/chapters/bn/' + fileNumber + '.json')
+      .then(response => response.json())
+      .then(data => {
+        // Clear previous content
+        modalBody.innerHTML = '';
+
+        // Create and append new content
+        var content = `<h5>${data.name} (${data.transliteration})</h5>
+                       <p>${data.translation}</p>
+                       <p><strong>Type:</strong> ${data.type}</p>
+                       <p><strong>Total Verses:</strong> ${data.total_verses}</p>
+                       <ul>`;
+        
+        data.verses.forEach(verse => {
+          content += `<li>
+                        <p>${verse.text}</p>
+                        <p><em>${verse.translation}</em></p>
+                        <p><strong>Transliteration:</strong> ${verse.transliteration}</p>
+                      </li>`;
+        });
+
+        content += '</ul>';
+        modalBody.innerHTML = content;
+      })
+      .catch(error => {
+        modalBody.innerHTML = `<p>There was an Error loading data</p>`;
+      });
+  });
+});
+</script>
+
+</body>
+</html>
